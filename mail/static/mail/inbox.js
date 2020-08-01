@@ -34,6 +34,57 @@ function load_mailbox(mailbox) {
 
   // Show the mailbox name
   document.querySelector('#emails-view').innerHTML = `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`;
+
+
+  fetch(`/emails/${mailbox}`)
+  .then(response => response.json())
+  .then(emails => {
+
+    console.log(emails)
+
+  
+
+    emails.forEach(email => {
+
+      const  new_div = document.createElement('div')
+
+      new_div.className = 'container'
+
+      new_div.style.border = "thin solid #000000";
+
+      new_div.style.marginBottom = "20px"
+
+      let mailbox_var = email.sender
+
+      let name = "Sender"
+
+      if (mailbox === "sent") {
+
+        mailbox_var = email.recipients
+
+        name = "Recipients"
+    }
+
+      new_div.innerHTML = `<div class="row">
+                            <div class="col"><b>${mailbox_var}</b></div>
+                            <div class="col">${email.subject}</div>
+                            <div class="col">${email.timestamp}</div>
+                          </div>`                  
+
+      if (email.read) {
+
+        new_div.style.backgroundColor = "#a39796"
+      }
+      
+                          
+      document.querySelector('#emails-view').append(new_div)
+
+    })
+
+
+  })
+
+
 }
 
 function send_email() {
