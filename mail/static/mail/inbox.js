@@ -18,6 +18,7 @@ function compose_email() {
 
   // Show compose view and hide other views
   document.querySelector('#emails-view').style.display = 'none';
+
   document.querySelector('#compose-view').style.display = 'block';
 
   // Clear out composition fields
@@ -30,6 +31,7 @@ function load_mailbox(mailbox) {
   
   // Show the mailbox and hide other views
   document.querySelector('#emails-view').style.display = 'block';
+
   document.querySelector('#compose-view').style.display = 'none';
 
   // Show the mailbox name
@@ -75,9 +77,10 @@ function load_mailbox(mailbox) {
 
         new_div.style.backgroundColor = "#a39796"
       }
+
       
                           
-      document.querySelector('#emails-view').append(new_div)
+      document.querySelector('#email-view').append(new_div)
 
     })
 
