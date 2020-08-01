@@ -18,8 +18,11 @@ function compose_email() {
 
   // Show compose view and hide other views
   document.querySelector('#emails-view').style.display = 'none';
-  document.querySelector('#compose-view').style.display = 'block';
 
+  document.querySelector('#email').style.display = 'none';
+
+
+  document.querySelector('#compose-view').style.display = 'block';
   // Clear out composition fields
   document.querySelector('#compose-recipients').value = '';
   document.querySelector('#compose-subject').value = '';
@@ -30,6 +33,9 @@ function load_mailbox(mailbox) {
   
   // Show the mailbox and hide other views
   document.querySelector('#emails-view').style.display = 'block';
+
+  document.querySelector('#email').style.display = 'none';
+
   document.querySelector('#compose-view').style.display = 'none';
 
   // Show the mailbox name
@@ -43,7 +49,6 @@ function load_mailbox(mailbox) {
     console.log(emails)
 
   
-
     emails.forEach(email => {
 
       const  new_div = document.createElement('div')
@@ -63,24 +68,25 @@ function load_mailbox(mailbox) {
         mailbox_var = email.recipients
 
         name = "Recipients"
-    }
-
+       
+      }
+    
       new_div.innerHTML = `<div class="row">
                             <div class="col"><b>${mailbox_var}</b></div>
                             <div class="col">${email.subject}</div>
                             <div class="col">${email.timestamp}</div>
-                          </div>`                  
+                          </div>`                 
 
       if (email.read) {
 
         new_div.style.backgroundColor = "#a39796"
       }
-      
-                          
+
+      new_div.addEventListener("click", () => display_mail(email.id, mailbox_var, name)); 
+ 
       document.querySelector('#emails-view').append(new_div)
 
     })
-
 
   })
 
@@ -111,3 +117,26 @@ function send_email() {
 }
 
 
+
+
+function display_mail(id_email, sender_reciver , name_ ) {
+
+  fetch(`emails/${id_email}`)
+  .then(response => response.json())
+  .then(email_data => {
+    document.querySelector('#email').style.display = 'block';    
+    document.querySelector('#emails-view').style.display = "none";
+    document.querySelector('#email').innerHTML = `<div><b>${name_}:</b>&nbsp${sender_reciver}</div>
+                                                  <div><b>Subject:</b>&nbsp${email_data.subject}</div>
+                                                  <div><b>Body:</b>&nbsp${email_data.body}</div>
+                                                  <div><b>TimeStamp:</b>&nbsp${email_data.timestamp}</div>`
+  })
+
+  fetch(`emails/${id_email}`, {
+    method: 'PUT',
+    body: JSON.stringify({ 
+      read: true
+    })
+  })
+
+}
