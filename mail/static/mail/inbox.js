@@ -13,6 +13,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
   });
 
+  
+
 
 function compose_email() {
 
@@ -29,69 +31,7 @@ function compose_email() {
   document.querySelector('#compose-body').value = '';
 }
 
-function load_mailbox(mailbox) {
-  
-  // Show the mailbox and hide other views
-  document.querySelector('#emails-view').style.display = 'block';
 
-  document.querySelector('#email').style.display = 'none';
-
-  document.querySelector('#compose-view').style.display = 'none';
-
-  // Show the mailbox name
-  document.querySelector('#emails-view').innerHTML = `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`;
-
-
-  fetch(`/emails/${mailbox}`)
-  .then(response => response.json())
-  .then(emails => {
-
-    console.log(emails)
-
-  
-    emails.forEach(email => {
-
-      const  new_div = document.createElement('div')
-
-      new_div.className = 'container'
-
-      new_div.style.border = "thin solid #000000";
-
-      new_div.style.marginBottom = "20px"
-
-      let mailbox_var = email.sender
-
-      let name = "Sender"
-
-      if (mailbox === "sent") {
-
-        mailbox_var = email.recipients
-
-        name = "Recipients"
-       
-      }
-    
-      new_div.innerHTML = `<div class="row">
-                            <div class="col"><b>${mailbox_var}</b></div>
-                            <div class="col">${email.subject}</div>
-                            <div class="col">${email.timestamp}</div>
-                          </div>`                 
-
-      if (email.read) {
-
-        new_div.style.backgroundColor = "#a39796"
-      }
-
-      new_div.addEventListener("click", () => display_mail(email.id, mailbox_var, name)); 
- 
-      document.querySelector('#emails-view').append(new_div)
-
-    })
-
-  })
-
-
-}
 
 function send_email() {
 
@@ -108,9 +48,11 @@ function send_email() {
       // Print result
       console.log(result);
 
+
+
   });
 
-  load_mailbox('sent')
+  load_mailbox('sent');
 
   return false;
 
@@ -119,7 +61,68 @@ function send_email() {
 
 
 
-function display_mail(id_email, sender_reciver , name_ ) {
+function load_mailbox(mailbox) {
+  
+  // Show the mailbox and hide other views
+  //document.querySelector('#emails-view').style.display = 'block';
+  document.querySelector('#email').style.display = 'none';
+  document.querySelector('#compose-view').style.display = 'none';
+  // Show the mailbox name
+  document.querySelector('#emails-view').innerHTML = `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`;
+
+  fetch(`/emails/${mailbox}`)
+  .then(response => response.json())
+  .then(emails => {
+
+    console.log("hey")
+
+    console.log(emails)
+
+    emails.forEach(email => {
+      const  new_div = document.createElement('div')
+      new_div.className = 'container'
+      new_div.style.border = "thin solid #000000";
+      new_div.style.marginBottom = "20px"
+
+      let mailbox_var = email.sender
+      let name = "Sender"
+
+      if (mailbox === "sent") {
+
+        mailbox_var = email.recipients
+
+        name = "Recipients"
+       
+      }
+    
+      new_div.innerHTML = `<div class="row">
+                            <div class="col"><b>${mailbox_var}</b></div>
+                            <div class="col">${email.subject}</div>
+                            <div class="col">${email.timestamp}</div>
+                          </div>`                 
+
+      if (email.read === true) {
+
+        new_div.style.backgroundColor = "#a39796"
+      }
+
+      new_div.addEventListener("click", () => display_mail(mailbox, email.id, mailbox_var, name)); 
+ 
+      document.querySelector('#emails-view').appendChild(new_div);
+
+
+    })
+
+    document.querySelector('#emails-view').style.display = 'block';
+
+
+  })
+
+
+}
+
+
+function display_mail( mailbox, id_email, sender_reciver , name_ ) {
 
   fetch(`emails/${id_email}`)
   .then(response => response.json())
@@ -132,11 +135,17 @@ function display_mail(id_email, sender_reciver , name_ ) {
                                                   <div><b>TimeStamp:</b>&nbsp${email_data.timestamp}</div>`
   })
 
-  fetch(`emails/${id_email}`, {
-    method: 'PUT',
-    body: JSON.stringify({ 
-      read: true
-    })
-  })
+  console.log(mailbox)
 
+  console.log(mailbox !== "sent")
+
+
+    fetch(`emails/${id_email}`, {
+      method: 'PUT',
+      body: JSON.stringify({ 
+        read: true
+      })
+    })
+
+ 
 }
