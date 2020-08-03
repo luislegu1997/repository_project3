@@ -14,8 +14,6 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   
-
-
 function compose_email() {
 
   // Show compose view and hide other views
@@ -57,8 +55,6 @@ function send_email() {
   return false;
 
 }
-
-
 
 function load_mailbox(mailbox) {
   
@@ -163,6 +159,20 @@ function display_mail( mailbox, id_email, sender_reciver , name_ ) {
                                                   <div><b>Subject:</b>&nbsp${email_data.subject}</div>
                                                   <div><b>Body:</b>&nbsp${email_data.body}</div>
                                                   <div><b>TimeStamp:</b>&nbsp${email_data.timestamp}</div>`
+
+    if (mailbox !== "sent"){
+
+      const reply = document.createElement('button')
+
+      reply.innerHTML = "reply"
+
+      reply.addEventListener('click', () => reply_funct(sender_reciver,email_data.subject, email_data.body,email_data.timestamp ));
+
+      document.querySelector('#email').append(reply)
+
+
+    }
+
   })
 
   console.log(mailbox)
@@ -201,6 +211,28 @@ function arch_unarch(id_email, mailbox) {
     load_mailbox('inbox')
 
   )
+
+
+}
+
+
+function reply_funct(sender, subject,body, time) {
+
+  compose_email();
+
+   document.querySelector('#compose-recipients').value = sender;
+
+   console.log(subject.slice(0,3) === "Re:" )
+
+   if (subject.slice(0,3) === "Re:"){
+     console.log("eee")
+
+      document.querySelector('#compose-subject').value = `${subject}`;
+
+   } else {
+      document.querySelector('#compose-subject').value = `Re: ${subject}`;
+   }
+   document.querySelector('#compose-body').value = `On ${time} ${sender} wrote: ${body}`;
 
 
 }
