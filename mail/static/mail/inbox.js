@@ -60,11 +60,10 @@ function send_email() {
 
 
 
-
 function load_mailbox(mailbox) {
   
   // Show the mailbox and hide other views
-  //document.querySelector('#emails-view').style.display = 'block';
+  document.querySelector('#emails-view').style.display = 'block';
   document.querySelector('#email').style.display = 'none';
   document.querySelector('#compose-view').style.display = 'none';
   // Show the mailbox name
@@ -73,8 +72,6 @@ function load_mailbox(mailbox) {
   fetch(`/emails/${mailbox}`)
   .then(response => response.json())
   .then(emails => {
-
-    console.log("hey")
 
     console.log(emails)
 
@@ -89,31 +86,62 @@ function load_mailbox(mailbox) {
 
       if (mailbox === "sent") {
 
-        mailbox_var = email.recipients
+          mailbox_var = email.recipients
 
-        name = "Recipients"
+          name = "Recipients"
        
       }
-    
+   
       new_div.innerHTML = `<div class="row">
-                            <div class="col"><b>${mailbox_var}</b></div>
-                            <div class="col">${email.subject}</div>
-                            <div class="col">${email.timestamp}</div>
-                          </div>`                 
+                              <div class="col"><b>${mailbox_var}</b></div>
+                              <div class="col">${email.subject}</div>
+                              <div class="col"><button>View</button></div>
+                              <div class="col">${email.timestamp}</div>            
+                            </div>`  
 
+
+      if (mailbox !== "sent") {
+
+
+        const archive_unarchive = document.createElement('button');
+
+        archive_unarchive.addEventListener('click', () => arch_unarch(email.id ,mailbox));
+
+
+        if (mailbox === "inbox"){
+
+          archive_unarchive.innerHTML = "Archive"
+
+        } else{
+
+          archive_unarchive.innerHTML = "Unarchive"
+
+        }
+
+        const col_div = document.createElement('div')
+
+        col_div.className = "col"
+
+        col_div.append(archive_unarchive)
+
+        new_div.childNodes[0].append(col_div)
+
+      }
+
+                  
       if (email.read === true) {
 
         new_div.style.backgroundColor = "#a39796"
       }
 
-      new_div.addEventListener("click", () => display_mail(mailbox, email.id, mailbox_var, name)); 
+      new_div.childNodes[0].childNodes[5].childNodes[0].addEventListener("click", () => display_mail(mailbox, email.id, mailbox_var, name)); 
+
+      console.log(new_div.childNodes[0].childNodes[2])
  
       document.querySelector('#emails-view').appendChild(new_div);
 
 
     })
-
-    document.querySelector('#emails-view').style.display = 'block';
 
 
   })
@@ -123,6 +151,8 @@ function load_mailbox(mailbox) {
 
 
 function display_mail( mailbox, id_email, sender_reciver , name_ ) {
+
+  console.log("are you printing?")
 
   fetch(`emails/${id_email}`)
   .then(response => response.json())
@@ -148,4 +178,29 @@ function display_mail( mailbox, id_email, sender_reciver , name_ ) {
     })
 
  
+}
+
+
+function arch_unarch(id_email, mailbox) {
+
+  let bool_var = false;
+
+  if (mailbox === "inbox"){
+
+      bool_var = true;
+  }
+
+  fetch(`emails/${id_email}`, {
+    method:'PUT',
+    body: JSON.stringify({
+      archived : bool_var
+    })
+  })
+  .then(
+
+    load_mailbox('inbox')
+
+  )
+
+
 }

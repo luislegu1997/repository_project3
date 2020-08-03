@@ -102,6 +102,13 @@ def mailbox(request, mailbox):
 @login_required
 def email(request, email_id):
 
+    print("heholay")
+
+    print(request.method)
+
+    print(request.method == "PUT")
+
+
     # Query for requested email
     try:
         email = Email.objects.get(user=request.user, pk=email_id)
@@ -115,9 +122,17 @@ def email(request, email_id):
     # Update whether email is read or should be archived
     elif request.method == "PUT":
         data = json.loads(request.body)
+
+       #print(data.get("archived"))
+
+        print("hey")
+        print(data)
+
         if data.get("read") is not None:
             email.read = data["read"]
         if data.get("archived") is not None:
+            print(data.get("archived"))
+            print("hola")
             email.archived = data["archived"]
         email.save()
         return HttpResponse(status=204)
